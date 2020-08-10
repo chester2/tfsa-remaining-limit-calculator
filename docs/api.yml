@@ -1,0 +1,48 @@
+openapi: 3.0.3
+info:
+  title: TFSA Remaining Limit Calculator
+  version: 1.0.0
+  description: Calculates current year's remaining TFSA contribution limit.
+servers:
+  - url: https://tfsa-rlc.herokuapp.com
+
+paths:
+  /:
+    post:
+      summary: Compute the remaining limit.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                currentYear:
+                  description: Must be a year for which the Canadian government has published a limit.
+                  type: integer
+                residencyYears:
+                  description: List of years during which the person owning the transactions is both over 18 and a Canadian resident. Ignore years beyond `currentYear`.
+                  type: array
+                  items:
+                    type: integer
+                transactions:
+                  description: List of transactions. Postive amount indicates contribution, negative amount indicates withdrawal. Ignore a transaction if its year is not found in `residencyYears`.
+                  type: array
+                  items:
+                    properties:
+                      year:
+                        type: integer
+                      amount:
+                        type: number
+      responses:
+        '200':
+          description: Remaining limit successfully calculated.
+          content:
+            application/json:
+              schema:
+                type: number
+        '400':
+          description: Invalid request body.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Error message
